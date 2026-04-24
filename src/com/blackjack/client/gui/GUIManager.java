@@ -1,11 +1,10 @@
 package com.blackjack.client.gui;
 
 // components for GUI
-import java.awt.BorderLayout;
+import java.awt.BorderLayout; 
 import java.awt.FlowLayout;
 import java.awt.Image;
-import java.io.File;
-import java.nio.file.Files;
+
 import java.awt.Color;
 import java.awt.Dimension;
 
