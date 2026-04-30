@@ -13,6 +13,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -43,11 +44,11 @@ public class GUIManager {
 		
 		// add screens to the main panel (used for switching between screens)
 		loginPanel = createLoginPanel();
-		//lobbyPanel = createLobbyPanel();
+		lobbyPanel = createLobbyPanel();
 		//tablePanel = createTablePanel();
 		
 		mainPanel.add(loginPanel, "LOGIN");
-		//mainPanel.add(lobbyPanel, "LOBBY");
+		mainPanel.add(lobbyPanel, "LOBBY");
 		//mainPanel.add(tablePanel, "TABLE");
 		
 		// add main panel to frame/window
@@ -77,13 +78,13 @@ public class GUIManager {
 		JLabel bckgrd = new JLabel(new ImageIcon(fitToSize));
 		
 		// create the panel
-		JPanel gridPanel = new JPanel();
+		JPanel loginPanel = new JPanel();
 		
-		gridPanel.setBackground(new Color(0,80,0));		// set the background of the created panel to a custom color (dark greenish, casino table vibe)
-		gridPanel.setBounds(295, 150, 500, 400);		//  set the location + size of panel (x, y, length, width)
+		loginPanel.setBackground(new Color(0,80,0));		// set the background of the created panel to a custom color (dark greenish, casino table vibe)
+		loginPanel.setBounds(295, 150, 500, 400);		//  set the location + size of panel (x, y, length, width)
 	
 		
-		gridPanel.setLayout(new GridBagLayout());		// create a GridBagLayout for customization
+		loginPanel.setLayout(new GridBagLayout());		// create a GridBagLayout for customization
 		
 		// the layout control for placing components in a GridBagLayout; 
 		// where and how each item is placed
@@ -103,12 +104,12 @@ public class GUIManager {
 	    layoutControl.gridx = 0;							// (x, y) <=>(0,0) (from top to bottom, ex:    |_0__|_1__|...
 	    layoutControl.gridy = 0;							//									  	   0   |____|_____
 	    layoutControl.gridwidth = 2;						// width; taking up how many columns	   1   |____|_____		)
-	    gridPanel.add(userTitle, layoutControl);			// add label to panel
+	    loginPanel.add(userTitle, layoutControl);			// add label to panel
 	    
 	    //------------Username Text Field--------------
 	    JTextField username = new JTextField(15);			// create a text field that has a capacity of 15
 	    layoutControl.gridy = 1;							// go under the label ("Username")
-	    gridPanel.add(username, layoutControl);				// add text field to panel
+	    loginPanel.add(username, layoutControl);				// add text field to panel
 	    
 	    //---------------------------------------------
 	    // 			CREATE PASSWORD FIELDS
@@ -118,12 +119,12 @@ public class GUIManager {
 	    JLabel paswrdTitle = new JLabel("Password");
 	    paswrdTitle.setForeground(Color.WHITE);
 	    layoutControl.gridy = 2;
-	    gridPanel.add(paswrdTitle, layoutControl);
+	    loginPanel.add(paswrdTitle, layoutControl);
 	    
 	    //------------Password Text Field--------------
 	    JTextField password = new JTextField(15);
 	    layoutControl.gridy = 3;
-	    gridPanel.add(password, layoutControl);
+	    loginPanel.add(password, layoutControl);
 	    
 	    //---------------------------------------------
 	  	// 			CREATE BUTTONS
@@ -135,7 +136,7 @@ public class GUIManager {
 	    layoutControl.gridx = 0;
 	    layoutControl.gridy = 4;
 	    layoutControl.gridwidth = 1;
-	    gridPanel.add(signUpBtn, layoutControl);
+	    loginPanel.add(signUpBtn, layoutControl);
 	    
 	    //------------Login Button---------------------
 	    JButton loginBtn = new JButton("Login");
@@ -143,9 +144,9 @@ public class GUIManager {
 	    layoutControl.gridx = 1;
 	    layoutControl.gridy = 4;
 	    layoutControl.gridwidth = 1;
-	    gridPanel.add(loginBtn, layoutControl);
+	    loginPanel.add(loginBtn, layoutControl);
 	    
-		bckgrd.add(gridPanel);
+		bckgrd.add(loginPanel);
 		
 		
 		JPanel group = new JPanel(new BorderLayout()); // create a panel to return at end of the method
@@ -155,15 +156,83 @@ public class GUIManager {
 		 * 					ACTION LISTENERS
 		 ****************************************************/
 		
+		signUpBtn.addActionListener(actionEvent ->{
+			String userInput = username.getText();
+			String pwInput = password.getText();
+			
+			client.sendMessage("SIGNUP" + " " + userInput + " " + pwInput);
+		});
 		
+		loginBtn.addActionListener(actionEvent ->{
+			String userInput = username.getText();
+			String pwInput = password.getText();
+			
+			client.sendMessage("LOGIN" + " " + userInput + " " + pwInput);
+		});
 		
 		return group;
 	}
 	
-	//private JPanel createLobbyPanel() 
+	private JPanel createLobbyPanel() 
 	{
+		/****************************************************
+		 * 						DESIGN
+		 ****************************************************/
+		// create the main panel
+		JPanel lobbyPanel = new JPanel();
+		lobbyPanel.setBackground(new Color(0,80,0));		// set the background of the created panel to a custom color (dark greenish, casino table vibe)
+		lobbyPanel.setLayout(new BorderLayout());		// create a GridBagLayout for customization
+			
 		
-		// return the panel
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BorderLayout());
+		leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		
+		JLabel howTitle = new JLabel("How To Play!");
+		leftPanel.add(howTitle);
+		
+		JTextArea instructions = new JTextArea();
+		instructions.setText(
+				"Click on one of the available tables to join ongoing " +
+				"game.\nIf Table is full you will not be able to join.\n\n" +
+				"Once a player joins the table you will be placed in a waiting\n" +
+				"room until next dealing.\n\n" +
+				"Once entered you will be allowed to place your bets and enter the" +
+				"current pot. Then your hand will be dealt when all bets are collected.\n\n" +
+				"Dealer will not hit when their hand total is >= 17\n\nTry your best to get your" +
+				" hand total to 21!\n\nPLAYER ACTIONS\nHit: Player is dealt a card.\n\n" +
+				"Stand: Player confirms and plays on current hand.\n\nFold: Player forfeits hand and" +
+				" bet made for current round."
+		);
+		
+	    instructions.setLineWrap(true);
+	    instructions.setWrapStyleWord(true);
+	    instructions.setFont(new Font("Arial", Font.PLAIN, 14));
+	    instructions.setPreferredSize(new Dimension(200, 0));
+	    
+		leftPanel.add(instructions, BorderLayout.CENTER);
+		
+		lobbyPanel.add(leftPanel, BorderLayout.WEST);
+		
+		JPanel bottomPanel = new JPanel();
+		
+		JButton accountBtn = new JButton("Account");
+		JButton logoutBtn = new JButton("Logout");
+		
+		accountBtn.addActionListener(actionListener -> showAccountPopup());
+	    logoutBtn.addActionListener(actionListener -> showLoginScreen());
+
+	    bottomPanel.add(accountBtn);
+	    bottomPanel.add(logoutBtn);
+	    
+	    leftPanel.add(bottomPanel, BorderLayout.SOUTH);
+		
+		
+		
+		
+	    
+	    
+		return lobbyPanel;
 	}
 	
 	//private JPanel createTablePanel() 
@@ -183,12 +252,61 @@ public class GUIManager {
 	}	
 	
 	public void showLobbyScreen() {
+		currentScreen = "LOBBY";										// updates the current screen state to login screen
+		((CardLayout) mainPanel.getLayout()).show(mainPanel, "LOBBY");  //
+	}
+	
+	private void showAccountPopup() {
+
+	    JDialog popUpwindow = new JDialog(frame, "Account", true);
+	    
+	    popUpwindow.setSize(300, 200);
+	    popUpwindow.setLayout(new BorderLayout());
+
+	    JLabel balanceLbl = new JLabel("Balance: $1000", SwingConstants.CENTER);
+	    balanceLbl.setFont(new Font("Arial", Font.BOLD, 16));
+
+	    JButton depositBtn = new JButton("Deposit");
+	    JButton withdrawBtn = new JButton("Withdraw");
+	    JButton closeBtn = new JButton("Close");
+
+	    depositBtn.addActionListener(actionListener -> {
+	        JOptionPane.showMessageDialog(popUpwindow, "Deposit feature not implemented yet.");
+	    });
+
+	    withdrawBtn.addActionListener(actionListener -> {
+	        JOptionPane.showMessageDialog(popUpwindow, "Withdraw feature not implemented yet.");
+	    });
+
+	    closeBtn.addActionListener(actionListener -> popUpwindow.dispose());
+
+	    JPanel actionButtons = new JPanel();
+	    actionButtons.add(depositBtn);
+	    actionButtons.add(withdrawBtn);
+	    actionButtons.add(closeBtn);
+
+	    popUpwindow.add(balanceLbl, BorderLayout.CENTER);
+	    popUpwindow.add(actionButtons, BorderLayout.SOUTH);
+
+	    popUpwindow.setVisible(true);
+	}
+	
+	/*
+
+	
+	//balance, join table, balance, signout
+	public void playerMenuScreen() {
 		
 	}
 	
-	public void showTableScreen() {
+	public void accountScreen() {
 		
 	}
+	
+	//host, signout
+	public void dealerMenuScreen() { 
+	
+	}*/
 	
 	/****************************************************
 	 * 		UPDATE IN GAME STATUS DISPLAY METHODS 

@@ -16,6 +16,7 @@ public class GUITest {
 		
 		gui.showLoginScreen();
 		
+		gui.showLobbyScreen();
 
 	}
 }
