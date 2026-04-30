@@ -1,5 +1,8 @@
 package com.blackjack.client.gui;
 
+import com.blackjack.testing.FakeClientGUITester; // Dummy CLient to test GUI while Client.java doesn't exist yet
+
+
 // components for GUI
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -14,7 +17,7 @@ import javax.swing.text.JTextComponent;
 
 public class GUIManager {
 
-	private Client client;										 // reference to client for GUI to send messages
+	private FakeClientGUITester client;										 // reference to client for GUI to send messages
 	private String currentScreen;								 // variable for tracking which screen is currently active for user
 	
 	JFrame frame;												 // main window
@@ -23,7 +26,7 @@ public class GUIManager {
 	
 	JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl;// table screen labels
 	
-	public GUIManager(Client client) {
+	public GUIManager(FakeClientGUITester client) {
 		
 		this.client = client; // reference to specific client
 		
@@ -76,8 +79,9 @@ public class GUIManager {
 	 ****************************************************/
 	
 	public void showLoginScreen() {
-		
-	}
+		currentScreen = "LOGIN";			// updates the current screen state to login screen
+		((CardLayout) mainPanel.getLayout()).show(mainPanel, "LOGIN");
+	}	
 	
 	public void showLobbyScreen() {
 		
