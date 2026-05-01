@@ -364,7 +364,7 @@ public class GUIManager {
 		
 		//------------Game Instructions Label-------------------
 		JLabel howToHeader = new JLabel("How To Play");					// create label
-		howToHeader.setFont(new Font("Arial", Font.BOLD, 18));			// set the font + size
+		howToHeader.setFont(new Font("Arial", Font.BOLD, 20));			// set the font + size
 		howToHeader.setForeground(Color.WHITE);							// set text color
 
 		
@@ -392,7 +392,7 @@ public class GUIManager {
 		);
 
 		// Customize font, size, text color, background color
-		instructions.setFont(new Font("Arial", Font.PLAIN, 14));
+		instructions.setFont(new Font("Arial", Font.PLAIN, 18));
 		instructions.setForeground(Color.BLACK);
 		instructions.setBackground(Color.LIGHT_GRAY);
 		
@@ -444,7 +444,7 @@ public class GUIManager {
 		//------------Game Tables Label-------------------
 		JLabel tableHeader = new JLabel("Game Tables");
 		tableHeader.setForeground(Color.WHITE);
-		tableHeader.setFont(new Font("Arial", Font.BOLD, 18));
+		tableHeader.setFont(new Font("Arial", Font.BOLD, 20));
 		
 		// Layout Modifiers
 		controlLayout.gridx = 1;
@@ -459,6 +459,7 @@ public class GUIManager {
 		tableContainer = new DefaultListModel<>(); 			 			// create a container that hold the game tables
 		tableList = new JList<>(tableContainer);               			// holds the tables data into a list
 
+		tableList.setFont(new Font("Arial", Font.BOLD, 18));
 		/******************************************************************************************/
 		/* 				TEMPORARY TEST DATA - REMOVE LATER WHEN SERVER SENDS TABLE LIST			  */
 		
