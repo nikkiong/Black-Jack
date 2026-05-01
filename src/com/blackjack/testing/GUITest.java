@@ -14,9 +14,8 @@ public class GUITest {
 		
 		GUIManager gui = new GUIManager(testClient);
 		
-		gui.showLoginScreen();
+		gui.showSignUpScreen();
 		
-		gui.showLobbyScreen();
 
 	}
 }

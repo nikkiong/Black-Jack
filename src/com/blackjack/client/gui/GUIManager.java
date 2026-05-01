@@ -46,13 +46,14 @@ public class GUIManager {
 		
 		// add screens to the main panel (used for switching between screens)
 		loginPanel = createLoginPanel();
-		//signUpPanel = createSignUpPanel();
+		signUpPanel = createSignUpPanel();
 		lobbyPanel = createLobbyPanel();
 		//tablePanel = createTablePanel();
 		
 		mainPanel.add(loginPanel, "LOGIN");
 		mainPanel.add(lobbyPanel, "LOBBY");
 		//mainPanel.add(tablePanel, "TABLE");
+		mainPanel.add(signUpPanel, "REGISTER");
 		
 		// add main panel to frame/window
 		frame.add(mainPanel);
@@ -174,7 +175,7 @@ public class GUIManager {
 			String pwInput = password.getText();
 			
 			client.sendMessage("REGISTER_REQUEST" + " " + userInput + " " + pwInput);  //**********WILL MODIFY ONCE CLIENT IS MADE*************
-			//showSignUpPanel();
+			showSignUpScreen();
 		});
 		
 		loginBtn.addActionListener(actionEvent ->{
@@ -189,7 +190,149 @@ public class GUIManager {
 	
 	private JPanel createSignUpPanel()
 	{
+		/****************************************************
+		 * 						DESIGN
+		 ****************************************************/
+		// create background of current screen
+		ImageIcon og = new ImageIcon(getClass().getResource("/images/background.JPEG"));
+		 
+		// scale the image to fit onto screen in a good proportion visually
+		Image fitToSize = og.getImage().getScaledInstance(1100, 700, Image.SCALE_SMOOTH);
 		
+		// make the image a label
+		JLabel bckgrd = new JLabel(new ImageIcon(fitToSize));
+		
+		// create the panel
+		JPanel signUpPanel = new JPanel();
+		
+		signUpPanel.setBackground(new Color(0,80,0));   // set the background of the created panel to a custom color (dark greenish, casino table vibe)
+		signUpPanel.setBounds(295, 150, 500, 400);		//  set the location + size of panel (x, y, length, width)
+	
+		
+		signUpPanel.setLayout(new GridBagLayout());		// create a GridBagLayout for customization
+		
+		// the layout control for placing components in a GridBagLayout; 
+		// where and how each item is placed
+		GridBagConstraints layoutControl = new GridBagConstraints();
+		
+		layoutControl.insets = new Insets(8,8,8,8); 		// adds padding around components (top, left, bottom, right)
+		layoutControl.anchor = GridBagConstraints.CENTER;   // centers the following components
+		layoutControl.fill = GridBagConstraints.HORIZONTAL; // fill space horizontal
+		//---------------------------------------------
+		// 			CREATE ROLE OPTION FIELD
+		//---------------------------------------------
+		
+		//------------Role Label-------------------
+		JLabel roleLabel = new JLabel("Sign Up As:");
+		roleLabel.setForeground(Color.WHITE);
+		
+		// Layout Modifiers
+		layoutControl.gridx = 0;
+	    layoutControl.gridy = 0;
+	    layoutControl.gridwidth = 2;
+	    signUpPanel.add(roleLabel, layoutControl);
+	    
+	    //------------Role Dropdown Box-------------------
+		String[] roles = {"Player",  "Dealer"};
+		JComboBox<String> roleOptions = new JComboBox<>(roles);
+		
+		// Layout Modifiers
+		layoutControl.gridx = 0;
+	    layoutControl.gridy = 1;
+	    layoutControl.gridwidth = 2;
+	    
+	    signUpPanel.add(roleOptions, layoutControl);
+		
+		//---------------------------------------------
+		// 			CREATE USERNAME FIELDS
+		//---------------------------------------------
+		
+		//------------Username Label-------------------
+	    JLabel userTitle = new JLabel("Username");			// make label
+	    userTitle.setForeground(Color.WHITE);				// set text color to white
+	    layoutControl.gridx = 0;							// (x, y) <=>(0,0) (from top to bottom, ex:    |_0__|_1__|...
+	    layoutControl.gridy = 3;							//									  	   0   |____|_____
+	    layoutControl.gridwidth = 2;						// width; taking up how many columns	   1   |____|_____		)
+	    signUpPanel.add(userTitle, layoutControl);			// add label to panel
+	    
+	    //------------Username Text Field--------------
+	    JTextField username = new JTextField(15);			// create a text field that has a capacity of 15
+	    layoutControl.gridy = 4;							// go under the label ("Username")
+	    signUpPanel.add(username, layoutControl);			// add text field to panel
+	    
+	    //---------------------------------------------
+	    // 			CREATE PASSWORD FIELDS
+	    //---------------------------------------------
+	    
+	    //------------Password Label-------------------
+	    JLabel paswrdTitle = new JLabel("Password");
+	    paswrdTitle.setForeground(Color.WHITE);
+	    layoutControl.gridy = 5;
+	    signUpPanel.add(paswrdTitle, layoutControl);
+	    
+	    //------------Password Text Field--------------
+	    JTextField password = new JTextField(15);
+	    layoutControl.gridy = 6;
+	    signUpPanel.add(password, layoutControl);
+	    
+	    
+	    //------------Sign Up Option Label--------------
+	    JLabel yesAccount = new JLabel("Have One Already?");	   // make label if user hasn't made an account yet
+	    yesAccount.setForeground(Color.WHITE);				   // set text color to white
+	    yesAccount.setFont(new Font("Arial", Font.ITALIC, 11));
+	    layoutControl.gridx = 1;							   // (x, y) <=>(0,0) (from top to bottom, ex:    |_0__|_1__|...
+	    layoutControl.gridy = 7;							   //									  	   0  |____|_____
+	    layoutControl.gridwidth = 2;						   // width; taking up how many columns	      1   |____|_____		)
+	    signUpPanel.add(yesAccount, layoutControl);			   // add label to panel
+	    
+	    //---------------------------------------------
+	  	// 			CREATE BUTTONS
+	  	//---------------------------------------------
+	    
+	    //------------Sign Up Button-------------------
+	    JButton signUpBtn = new JButton("Sign Up");
+	    signUpBtn.setForeground(Color.BLACK);
+	    layoutControl.gridx = 0;
+	    layoutControl.gridy = 8;
+	    layoutControl.gridwidth = 1;
+	    signUpPanel.add(signUpBtn, layoutControl);
+	    
+	    //------------Login Button---------------------
+	    JButton loginBtn = new JButton("Login");
+	    loginBtn.setForeground(Color.BLACK);
+	    layoutControl.gridx = 1;
+	    layoutControl.gridy = 8;
+	    layoutControl.gridwidth = 1;
+	    signUpPanel.add(loginBtn, layoutControl);
+	    
+		bckgrd.add(signUpPanel);
+		
+		
+		JPanel group = new JPanel(new BorderLayout()); // create a panel to return at end of the method
+		group.add(bckgrd);							   // add label to panel
+		
+		/****************************************************
+		 * 					ACTION LISTENERS
+		 ****************************************************/
+		
+		signUpBtn.addActionListener(actionEvent ->{
+			String userInput = username.getText();
+			String pwInput = password.getText();
+			String role = ((String) roleOptions.getSelectedItem()).toUpperCase(); // saves role user selected to sign up ex: role = "PLAYER" or "DEALER"
+			
+			client.sendMessage("REGISTER_RESPONSE" + " " + userInput + " " + pwInput + " " + role);  //**********WILL MODIFY ONCE CLIENT IS MADE*************
+			showLoginScreen();
+		});
+		
+		loginBtn.addActionListener(actionEvent ->{
+			String userInput = username.getText();
+			String pwInput = password.getText();
+			
+			client.sendMessage("LOGIN_REQUEST" + " " + userInput + " " + pwInput);     //**********WILL MODIFY ONCE CLIENT IS MADE*************
+			showLoginScreen();
+		});
+		
+		return group;
 	}
 	
 	private JPanel createLobbyPanel() 
@@ -405,7 +548,8 @@ public class GUIManager {
 	}	
 	
 	public void showSignUpScreen() {
-		
+		currentScreen = "REGISTER";										// updates the current screen state to login screen
+		((CardLayout) mainPanel.getLayout()).show(mainPanel, "REGISTER");  //
 	}
 	
 	public void showLobbyScreen() {
@@ -415,6 +559,7 @@ public class GUIManager {
 	
 	private void showAccountPopup() {
 
+		currentScreen = "ACCOUNT";
 	    JDialog popUpwindow = new JDialog(frame, "Account", true);					
 	    
 	    popUpwindow.setSize(300, 200);
