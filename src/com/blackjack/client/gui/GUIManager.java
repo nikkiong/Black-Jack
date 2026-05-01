@@ -27,7 +27,8 @@ public class GUIManager {
 	
 	JFrame frame;												 // main window
 	JPanel mainPanel, 											 // holds all differnt screens (login, lobby, table)
-		   loginPanel, signUpPanel, playerlobbyPanel, tablePanel;  				 // individual screens
+		   loginPanel, signUpPanel, playerlobbyPanel, tablePanel,
+		   playerTablePanel;  				 // individual screens
 	
 	JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl;// table screen labels
 	
@@ -48,12 +49,14 @@ public class GUIManager {
 		loginPanel = createLoginPanel();
 		signUpPanel = createSignUpPanel();
 		playerlobbyPanel = createPlayerLobbyPanel();
+		playerTablePanel = createPlayerTablePanel();
 		//tablePanel = createTablePanel();
 		
 		mainPanel.add(loginPanel, "LOGIN");
 		mainPanel.add(playerlobbyPanel, "PLAYER_LOBBY");
 		//mainPanel.add(tablePanel, "TABLE");
 		mainPanel.add(signUpPanel, "REGISTER");
+		mainPanel.add(playerTablePanel, "PLAYER_TABLE");
 		
 		// add main panel to frame/window
 		frame.add(mainPanel);
@@ -456,6 +459,16 @@ public class GUIManager {
 		tableContainer = new DefaultListModel<>(); 			 			// create a container that hold the game tables
 		tableList = new JList<>(tableContainer);               			// holds the tables data into a list
 
+		/******************************************************************************************/
+		/* 				TEMPORARY TEST DATA - REMOVE LATER WHEN SERVER SENDS TABLE LIST			  */
+		
+		tableContainer.addElement("Table 1 (2/5 players)");
+		tableContainer.addElement("Table 2 (4/5 players)");
+		tableContainer.addElement("Table 3 (1/5 players)");
+		
+		/*******************************************************************************************/
+		
+		
 		tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// lets you click 1 table at a time
 			     
 		JScrollPane scroll = new JScrollPane(tableList); 				// puts list into a scrollable pane (only on the right side)
@@ -541,19 +554,32 @@ public class GUIManager {
 		
 		// return the panel
 	}
-	
-	private JPanel createPlayerTablePanel() 
-	{
-		
-		// return the panel
-	}
-	
 	private JPanel createDealerTablePanel() 
 	{
 		
 		// return the panel
 	}
 	*/
+	private JPanel createPlayerTablePanel() 
+	{
+		/****************************************************
+		 * 						DESIGN
+		 ****************************************************/
+		JPanel pTablePanel = new JPanel();								// create main lobby screen
+
+		pTablePanel.setLayout(new GridBagLayout());						// set layout to GridBag for controling layout
+		
+		pTablePanel.setBackground(new Color(0, 80, 0));					// set background color to a dark green
+		
+		GridBagConstraints controlLayout = new GridBagConstraints();    // layout modifiers
+
+		controlLayout.insets = new Insets(5,5,5,5); 					// makes space between margins (outside) (top, left, bottom, right)
+		controlLayout.fill = GridBagConstraints.BOTH;					// fill screen both horizontally + vertically
+		
+		return pTablePanel;
+	}
+	
+	
 	
 	/****************************************************************************************************
 	 * 
@@ -572,16 +598,16 @@ public class GUIManager {
 	}
 	
 	public void showPlayerLobbyScreen() {
-		currentScreen = "LOBBY";										// updates the current screen state to login screen
+		currentScreen = "PLAYER_LOBBY";										// updates the current screen state to login screen
 		((CardLayout) mainPanel.getLayout()).show(mainPanel, "PLAYER_LOBBY");  //
 	}
 	
-	public void showDealerLobbyScreen() {
-		
-	}
-	
 	public void showPlayerTableScreen() {
+		currentScreen = "PLAYER_TABLE";										// updates the current screen state to login screen
+		((CardLayout) mainPanel.getLayout()).show(mainPanel, "PLAYER_TABLE");  //
 	
+	}
+	public void showDealerLobbyScreen() {
 		
 	}
 	
