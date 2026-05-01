@@ -27,7 +27,7 @@ public class GUIManager {
 	
 	JFrame frame;												 // main window
 	JPanel mainPanel, 											 // holds all differnt screens (login, lobby, table)
-		   loginPanel, signUpPanel, lobbyPanel, tablePanel;  				 // individual screens
+		   loginPanel, signUpPanel, playerlobbyPanel, tablePanel;  				 // individual screens
 	
 	JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl;// table screen labels
 	
@@ -47,11 +47,11 @@ public class GUIManager {
 		// add screens to the main panel (used for switching between screens)
 		loginPanel = createLoginPanel();
 		signUpPanel = createSignUpPanel();
-		lobbyPanel = createLobbyPanel();
+		playerlobbyPanel = createPlayerLobbyPanel();
 		//tablePanel = createTablePanel();
 		
 		mainPanel.add(loginPanel, "LOGIN");
-		mainPanel.add(lobbyPanel, "LOBBY");
+		mainPanel.add(playerlobbyPanel, "PLAYER_LOBBY");
 		//mainPanel.add(tablePanel, "TABLE");
 		mainPanel.add(signUpPanel, "REGISTER");
 		
@@ -64,9 +64,13 @@ public class GUIManager {
 		showLoginScreen(); 								     // starting screen to play game (login screen)
 	}
 	
-	/****************************************************
-	 * 				CREATE DIFFERENT SCREENS
-	 ****************************************************/
+	/****************************************************************************************************
+	 * 
+	 * 										CREATE DIFFERENT SCREENS
+	 * 
+	 ****************************************************************************************************/
+	
+	
 	private JPanel createLoginPanel() 
 	{
 		/****************************************************
@@ -335,7 +339,7 @@ public class GUIManager {
 		return group;
 	}
 	
-	private JPanel createLobbyPanel() 
+	private JPanel createPlayerLobbyPanel() 
 	{
 		/****************************************************
 		 * 						DESIGN
@@ -530,17 +534,32 @@ public class GUIManager {
 	    });
 		return lobbyPanel;
 	}
+	/*
 	
-	//private JPanel createTablePanel() 
+	private JPanel createDealerLobbyPanel() 
 	{
 		
 		// return the panel
 	}
 	
-	/****************************************************
-	 * 				SWITCH BETWEEN SCREENS
-	 ****************************************************/
+	private JPanel createPlayerTablePanel() 
+	{
+		
+		// return the panel
+	}
 	
+	private JPanel createDealerTablePanel() 
+	{
+		
+		// return the panel
+	}
+	*/
+	
+	/****************************************************************************************************
+	 * 
+	 * 										SHOW DIFFERENT SCREENS
+	 * 
+	 ****************************************************************************************************/
 	public void showLoginScreen() {
 
 		currentScreen = "LOGIN";										// updates the current screen state to login screen
@@ -552,70 +571,121 @@ public class GUIManager {
 		((CardLayout) mainPanel.getLayout()).show(mainPanel, "REGISTER");  //
 	}
 	
-	public void showLobbyScreen() {
+	public void showPlayerLobbyScreen() {
 		currentScreen = "LOBBY";										// updates the current screen state to login screen
-		((CardLayout) mainPanel.getLayout()).show(mainPanel, "LOBBY");  //
+		((CardLayout) mainPanel.getLayout()).show(mainPanel, "PLAYER_LOBBY");  //
 	}
 	
-	private void showAccountPopup() {
+	public void showDealerLobbyScreen() {
+		
+	}
+	
+	public void showPlayerTableScreen() {
+	
+		
+	}
+	
+	public void showDealerTableScreen() {
+		
+	}
+	
+	public void showAccountPopup() {
 
-		currentScreen = "ACCOUNT";
-	    JDialog popUpwindow = new JDialog(frame, "Account", true);					
+		currentScreen = "ACCOUNT";					// updates the state to know what screen user is on
+		
+		//---------------------------------------------
+	  	// 			CREATE POP UP WINDOW
+	  	//---------------------------------------------
+		// Create a pop up window for account
+	    JDialog popUpWindow = new JDialog(frame, "ACCOUNT", true);					
 	    
-	    popUpwindow.setSize(300, 200);
-	    popUpwindow.setLayout(new BorderLayout());
+	   
+	    popUpWindow.setSize(300, 200);			   // set size of window
+	    popUpWindow.setLayout(new BorderLayout()); // a layout with no gaps between components
 
-	    JLabel balanceLbl = new JLabel("Balance: $1000", SwingConstants.CENTER);
-	    balanceLbl.setFont(new Font("Arial", Font.BOLD, 16));
+	    
+	    JLabel moneyLbl = new JLabel("Balance: ", SwingConstants.CENTER);  // label for balance
+	    moneyLbl.setFont(new Font("Arial", Font.BOLD, 16));				   // set font
 
+	    //---------------------------------------------
+	  	// 				CREATE BUTTONS
+	  	//---------------------------------------------
+	    
+		//-------Deposit, Withdraw, Close Buttons---------------
 	    JButton depositBtn = new JButton("Deposit");
-	    JButton withdrawBtn = new JButton("Withdraw");
+	    JButton cashOutBtn = new JButton("Cashout");
 	    JButton closeBtn = new JButton("Close");
 
+	    //-------Group Buttons To 1 Panel---------------
+	    JPanel datCashButtons = new JPanel();
+	    
+	    datCashButtons.add(depositBtn);
+	    datCashButtons.add(cashOutBtn);
+	    datCashButtons.add(closeBtn);
+	    
+	    /****************************************************
+		 * 					ACTION LISTENERS
+		 ****************************************************/
 	    depositBtn.addActionListener(actionListener -> {
-	        JOptionPane.showMessageDialog(popUpwindow, "Deposit feature not implemented yet.");
+	    	
+	    	// asks user for deposit amount
+	    	String input = JOptionPane.showInputDialog(popUpWindow, "Enter Deposit Amount:");
+	    	
+	    	try {
+	    		
+	    		// makes sure user didn't click cancel
+	    		if (input != null)
+	    		{
+	    			double amount = Double.parseDouble(input); 					// Converts string to a number
+	    			
+	    			// sends deposit request to server to update the balance
+	    			client.sendMessage("DEPOSIT_REQUEST " + amount);
+	    			
+	    		}
+		       // handles if input is invalid (letters or empty input)
+	    	 } catch(Exception error) {
+	    		 JOptionPane.showMessageDialog(popUpWindow,  "Invalid Amount.");
+	    	 }
 	    });
 
-	    withdrawBtn.addActionListener(actionListener -> {
-	        JOptionPane.showMessageDialog(popUpwindow, "Withdraw feature not implemented yet.");
+	    cashOutBtn.addActionListener(actionListener -> {
+	    	// asks user for cash out amount
+	    	String input = JOptionPane.showInputDialog(popUpWindow, "Enter Cashout Amount:");
+	    	
+	    	try {
+	    		// makes sure user didn't cancel
+	    		if (input != null)
+	    		{
+	    			double amount = Double.parseDouble(input);
+	    			
+	    			// sends cash out request to server to update the balance
+	    			client.sendMessage("CASHOUT_REQUEST " + amount);
+	    			
+	    		}
+	    	   // handles if input is invalid (letters or empty input)
+	    	 } catch(Exception error) {
+	    		 JOptionPane.showMessageDialog(popUpWindow,  "Invalid Amount.");
+	    	 }
 	    });
 
-	    closeBtn.addActionListener(actionListener -> popUpwindow.dispose());
+	    closeBtn.addActionListener(actionListener -> popUpWindow.dispose());
 
-	    JPanel actionButtons = new JPanel();
-	    actionButtons.add(depositBtn);
-	    actionButtons.add(withdrawBtn);
-	    actionButtons.add(closeBtn);
-
-	    popUpwindow.add(balanceLbl, BorderLayout.CENTER);
-	    popUpwindow.add(actionButtons, BorderLayout.SOUTH);
-
-	    popUpwindow.setVisible(true);
+	    //-------Add Components to Pop Up Window---------------
+	    popUpWindow.add(moneyLbl, BorderLayout.CENTER);
+	    popUpWindow.add(datCashButtons, BorderLayout.SOUTH);
+	    
+	    //-------Placement + Visibility of Window---------------
+	    popUpWindow.setLocationRelativeTo(null);
+	    popUpWindow.setVisible(true);
 	}
 	
-	private void showPlayerTableScreen() {
-		
-	}
-	/*
-
 	
-	//balance, join table, balance, signout
-	public void playerMenuScreen() {
-		
-	}
 	
-	public void accountScreen() {
-		
-	}
-	
-	//host, signout
-	public void dealerMenuScreen() { 
-	
-	}*/
-	
-	/****************************************************
-	 * 		UPDATE IN GAME STATUS DISPLAY METHODS 
-	 ****************************************************/
+	/****************************************************************************************************
+	 * 
+	 * 								UPDATE IN GAME STATUS DISPLAY METHODS
+	 * 
+	 ****************************************************************************************************/
 	
 	public void displayStatus(String message) {
 		
