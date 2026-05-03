@@ -32,12 +32,15 @@ public class GUIManager {
 	
 	private String currentScreen;								 // variable for tracking which screen is currently active for user
 	
+	private boolean hasBet = false; 							 // variable for tracking if player placed a bet or not 
+	
 	JFrame frame;												 // main window
 	JPanel mainPanel, 											 // holds all differnt screens (login, lobby, table)
 		   loginPanel, signUpPanel, playerlobbyPanel, tablePanel,
-		   playerTablePanel, tableScreenPanel;  				 // individual screens
+		   playerTablePanel, tableScreenPanel, playerCards, dealerCards;  				 // individual screens
 	
-	JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl;// table screen labels
+	JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl, faceDownCard;// table screen labels
+	
 	
 	public GUIManager(FakeClientGUITester client) {
 		
@@ -561,8 +564,6 @@ public class GUIManager {
 	    		// tells server player wants to join a table
 	    		client.sendMessage("JOIN_TABLE_REQUEST"); //**********WILL MODIFY ONCE CLIENT IS MADE*************
 	    		
-	    		updatePlayers(playersContainer);
-	    		
 	    		showPlayerTableScreen(); // proceed to going to table game (Player perspective)
 	    	}
 	    			
@@ -590,6 +591,8 @@ public class GUIManager {
 		tablePanel.setPreferredSize(null);
 		tablePanel.setBackground(new Color(0, 80, 0));		
 
+		tablePanel.setPreferredSize(new Dimension(1100,700));
+		
 		GridBagConstraints layoutControl = new GridBagConstraints();
 				
 		layoutControl.insets = new Insets(10,10,10,10); 		// adds padding around components (top, left, bottom, right)
@@ -607,6 +610,25 @@ public class GUIManager {
    		layoutControl.weighty = .20;
    		
    		tablePanel.add(dealerLbl,layoutControl);
+   		
+   		dealerCards = new JPanel();
+   		
+   		dealerCards.add(createCardImage("ACE_SPADES")); //**********TEMP, reality: client gets -> dealerCard1, dealerCard.add(createCardImage(receivedCard))
+   		
+   		faceDownCard = createCardImage("back");
+   		
+   		dealerCards.add(faceDownCard);
+   		
+   		layoutControl.gridx = 2;
+   		layoutControl.gridy = 1;
+   		
+   		tablePanel.add(dealerCards, layoutControl);
+   		   		
+   		GridBagConstraints playerLayout = new GridBagConstraints();
+   		playerLayout.insets = new Insets(10,10,10,10);
+   		playerLayout.fill = GridBagConstraints.NONE;
+   		
+   		
 		// build player boxes
 	    for (int i = 0; i < playersContainer.size(); i++) {
 
@@ -619,70 +641,39 @@ public class GUIManager {
 	        case 0:
 	        	layoutControl.gridx = 0;
 	    		layoutControl.gridy = 2;
-	    		layoutControl.weightx = .20;
-	    		layoutControl.weighty = .20;
-	    		
-	    		tablePanel.add(playerBox,layoutControl);
 	    		break;
 	        case 1:
 	        	layoutControl.gridx = 0;
 	    		layoutControl.gridy = 4;
-	    		layoutControl.weightx = .20;
-	    		layoutControl.weighty = .20;
-	    		
-	    		tablePanel.add(playerBox,layoutControl);
 	    		break;
 	        case 2:
 	        	layoutControl.gridx = 4;
 	    		layoutControl.gridy = 1;
-	    		layoutControl.weightx = .20;
-	    		layoutControl.weighty = .20;
-	    		
-	    		tablePanel.add(playerBox,layoutControl);
 	    		break;
 	        case 3:
 	        	layoutControl.gridx = 4;
 	    		layoutControl.gridy = 3;
-	    		layoutControl.weightx = .20;
-	    		layoutControl.weighty = .20;
-
-	    		tablePanel.add(playerBox,layoutControl);
 	    		break;
 	        case 4:
 	        	layoutControl.gridx = 4;
 	    		layoutControl.gridy = 5;
-	    		layoutControl.weightx = .20;
-	    		layoutControl.weighty = .20;
-	    		
-	    		tablePanel.add(playerBox,layoutControl);
 	    		break;
 	        } 
+	        
+	        tablePanel.add(playerBox,layoutControl);
 	    }
-	    JPanel playerCards = new JPanel();
+	    
+	    playerCards = new JPanel();
         layoutControl.fill = GridBagConstraints.NONE;
 
-        playerCards.add(createCardImage("ACE_SPADES"),layoutControl);
-        playerCards.add(createCardImage("10_HEARTS"),layoutControl);
+        playerCards.add(createCardImage("ACE_SPADES"));
+        playerCards.add(createCardImage("10_HEARTS"));
         
         layoutControl.gridx = 2;
 		layoutControl.gridy = 6;
-		layoutControl.weightx = .20;
-		layoutControl.weighty = .20;
 		
         tablePanel.add(playerCards, layoutControl);
         
-        JPanel dealerCards = new JPanel();
-        layoutControl.fill = GridBagConstraints.NONE;
-        
-        dealerCards.add(createCardImage("ACE_SPADES"),layoutControl);
-        dealerCards.add(createCardImage("10_HEARTS"),layoutControl);
-        
-        layoutControl.gridx = 2;
-		layoutControl.gridy = 1;
-		layoutControl.weightx = .20;
-		layoutControl.weighty = .20;
-		
-        tablePanel.add(dealerCards, layoutControl);
         
         JPanel actionBtns = new JPanel(new BorderLayout());
         
@@ -696,8 +687,6 @@ public class GUIManager {
         
         layoutControl.gridx = 1;
 		layoutControl.gridy = 6;
-		layoutControl.weightx = 0;
-		layoutControl.weighty = 0;
 		
         tablePanel.add(actionBtns, layoutControl);
         
@@ -705,8 +694,6 @@ public class GUIManager {
         
         layoutControl.gridx = 3;
 		layoutControl.gridy = 6;
-		layoutControl.weightx = 0;
-		layoutControl.weighty = 0;
 		
         tablePanel.add(betBtn, layoutControl);
         
@@ -714,16 +701,51 @@ public class GUIManager {
         
         layoutControl.gridx = 4;
 		layoutControl.gridy = 7;
-		layoutControl.gridwidth = 1;
-		layoutControl.weightx = 1;
-		layoutControl.weighty = 0;
-		layoutControl.anchor = GridBagConstraints.CENTER;
 		
         tablePanel.add(exitBtn, layoutControl);
         
-        hitBtn.addActionListener(actionEvent -> client.sendMessage("HIT"));
-	    standBtn.addActionListener(actionEvent -> client.sendMessage("STAND"));
-	    foldBtn.addActionListener(actionEvent -> client.sendMessage("FOLD"));
+
+        hitBtn.addActionListener(actionEvent -> {
+        	
+        	if(!hasBet)
+        	{
+        		JOptionPane.showMessageDialog(tablePanel, "You must bet first!");
+        		return;
+        	}
+        	
+        	client.sendMessage("HIT_REQUEST"); //*************CHANGE WHEN SERVER/CLIENT FINISHED*************** "HIT_REQUEST" + playerId
+        	
+        	addPlayerCard("5_CLUBS"); //*************CHANGE WHEN SERVER/CLIENT FINISHED*************** 
+        	//server would call like "PLAYER_ACTION_REQUEST" or "HIT_REQUEST" 5_HEARTS, 
+        	// client call addPlayerCard(receivedCard)
+        });
+	    standBtn.addActionListener(actionEvent -> {
+	    	if(!hasBet)
+        	{
+        		JOptionPane.showMessageDialog(tablePanel, "You must bet first!");
+        		return;
+        	}
+	    	
+	    	client.sendMessage("STAND_REQUEST");
+	    	
+	    	flipUpDealer(); //TEMPORARY
+	    });
+	    foldBtn.addActionListener(actionEvent -> {
+	    	
+	    	if(!hasBet)
+        	{
+        		JOptionPane.showMessageDialog(tablePanel, "You must bet first!");
+        		return;
+        	}
+	    	
+	    	client.sendMessage("FOLD_REQUEST");
+	    	
+	    	hitBtn.setEnabled(false);
+	    	standBtn.setEnabled(false);
+	    	foldBtn.setEnabled(false);
+
+	    	JOptionPane.showMessageDialog(tablePanel, "Folded. Must wait for next round to replay..");
+	    });
 	    betBtn.addActionListener(actionEvent -> {
 
 	        String input = JOptionPane.showInputDialog(tablePanel, "Enter Bet Amount:");
@@ -742,6 +764,12 @@ public class GUIManager {
 
 	                client.sendMessage("BET_REQUEST " + amount);
 
+	                hasBet = true;
+	                
+	                hitBtn.setEnabled(true);
+	                standBtn.setEnabled(true);
+	                foldBtn.setEnabled(true);
+	                
 	                JOptionPane.showMessageDialog(tablePanel, "You bet: $" + amount);
 	            }
 
@@ -787,6 +815,8 @@ public class GUIManager {
 		
 		frame.revalidate();
 		frame.repaint();
+		
+		JOptionPane.showMessageDialog(frame, "Make a Bet To Start The Game");
 	}
 	public void showDealerLobbyScreen() {
 	}
@@ -975,14 +1005,72 @@ public class GUIManager {
 
 	    SwingUtilities.invokeLater(() -> { // run later on UI thread
 
-	        tableScreenPanel.removeAll();
-	        tableScreenPanel.setLayout(new BorderLayout());
-	        tableScreenPanel.add(createPlayerTablePanel(), BorderLayout.CENTER);
+	    	 tableScreenPanel.removeAll(); 
+
+	         GridBagConstraints layoutControl = new GridBagConstraints();
+	         layoutControl.insets = new Insets(10,10,10,10);
+	         
+	    	 for (int i = 0; i < playersContainer.size(); i++) {
+	    		 String name = playersContainer.getElementAt(i);
+
+	             JPanel playerBox = createPlayerBox(name, 0, 0);
+
+	            switch(i)
+	            {
+	                case 0 -> { layoutControl.gridx = 0; layoutControl.gridy = 2; }
+	                case 1 -> { layoutControl.gridx = 0; layoutControl.gridy = 4; }
+	                case 2 -> { layoutControl.gridx = 4; layoutControl.gridy = 1; }
+	                case 3 -> { layoutControl.gridx = 4; layoutControl.gridy = 3; }
+	                case 4 -> { layoutControl.gridx = 4; layoutControl.gridy = 5; }
+	            }
+
+	            tableScreenPanel.add(playerBox, layoutControl);	 
+	            
+	            }
 
 	        tableScreenPanel.revalidate();
 	        tableScreenPanel.repaint();
 	    });
 	}
+	
+	public void addPlayerCard(String cardName)
+	{
+		JLabel card = new JLabel();
+		
+		card = createCardImage(cardName);
+		
+		playerCards.add(card);
+		
+		playerCards.revalidate();
+		playerCards.repaint();
+	}
+	
+	public void revealCard(String cardName)
+	{
+		dealerCards.removeAll();
+		
+		dealerCards.add(createCardImage("ACE_SPADES"));  
+		dealerCards.add(createCardImage(cardName));      
+		
+		dealerCards.revalidate();
+		dealerCards.repaint();
+	}
+	
+	
+	public void flipUpDealer()
+	{
+		dealerCards.removeAll();
+		
+		// change to something like dealerCard.add(createCardImage(serverCard1 etc))
+		// rn for testing
+		dealerCards.add(createCardImage("ACE_SPADES"));   
+		dealerCards.add(createCardImage("10_HEARTS"));   
+		
+		dealerCards.revalidate();
+		dealerCards.repaint();
+		
+	}
+	
 	
 	public void displayStatus(String message) {
 		
