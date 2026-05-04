@@ -1,18 +1,17 @@
-package network;
+package com.blackjack.BlackJackClientServer.src.network;
 
 import java.io.*;
 import java.net.*;
 
 // Server class
 class Server {
-    public static void main(String[] args)
-    {
+	static int usercount = 0;
+    public static void main(String[] args){
+    	
         ServerSocket server = null;
 
         try {
-
-            // server is listening on port 1234
-            server = new ServerSocket(1234);
+            server = new ServerSocket(1999);
             server.setReuseAddress(true);
 
             // running infinite loop for getting
@@ -28,6 +27,8 @@ class Server {
                 System.out.println("New client connected "
                                    + client.getInetAddress()
                                          .getHostAddress());
+                usercount++;
+                System.out.println("Status: User " + usercount + " Connected");
 
                 // create a new thread object
                 ClientHandler clientSock
@@ -96,6 +97,7 @@ class Server {
                 try {
                     if (out != null) {
                         out.close();
+                        usercount--;
                     }
                     if (in != null) {
                         in.close();

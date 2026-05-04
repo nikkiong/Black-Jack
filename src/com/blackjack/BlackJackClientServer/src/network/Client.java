@@ -1,4 +1,4 @@
-package network;
+package com.blackjack.BlackJackClientServer.src.network;
 
 import java.io.*;
 import java.net.*;
@@ -6,9 +6,7 @@ import java.util.*;
 
 class Client {
     public static void main(String[] args){
-        // establish a connection by providing host and port
-        // number
-        try (Socket socket = new Socket("192.168.1.253", 1234)) {
+        try (Socket socket = new Socket("localhost", 1999)) {
           
             // writing to server
             PrintWriter out = new PrintWriter(
@@ -27,17 +25,19 @@ class Client {
               
                 // reading from user
                 line = sc.nextLine();
-
+                // End Connection 
+                if(line.equals("End") || line.equals("end")) {
+                	socket.close();
+                	sc.close();
+                	System.out.println("Connection Terminated!");
+                	break;
+                }else {
                 // sending the user input to server
                 out.println(line);
                 out.flush();
-
-                // displaying server reply
-                System.out.println("Server replied "
-                                   + in.readLine());
+                System.out.println("Server recieved message: " + line);
+                }
             }
-          
-            // closing the scanner object
             sc.close();
         }
         catch (IOException e) {
