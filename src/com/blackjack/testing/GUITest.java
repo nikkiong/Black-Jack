@@ -13,7 +13,12 @@ public class GUITest {
 		
 		GuiManager gui = new GuiManager(testClient);
 		
-		gui.showDealerLobbyScreen();
+		// to switch and test screens
+		//gui.showLoginScreen();
+		//gui.showPlayerLobbyScreen();
+		//gui.showPlayerTableScreen();
+		//gui.showDealerLobbyScreen();
+		gui.showDealerTableScreen();
 		
 
 	}
