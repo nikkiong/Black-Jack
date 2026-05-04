@@ -7,3 +7,4 @@ public enum TableStatus {
     FULL,      // table has reached max player capacity
     EMPTY      // no players at the table
 }
+
