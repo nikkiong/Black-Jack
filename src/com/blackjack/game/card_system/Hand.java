@@ -17,9 +17,13 @@ public class Hand {
     public void clear() { // clears the hand
         cards.clear();
     }
-
+    
     public List<Card> getCards() {// returns all cards
         return cards;
+    }
+
+    public int size() { // returns number of cards in hand
+        return cards.size();
     }
 
     public int getTotal() {// calculates hand total
