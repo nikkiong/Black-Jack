@@ -19,7 +19,7 @@ import java.awt.Font;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
-public class GUIManager {
+public class GuiManager {
 
 	private FakeClientGUITester client;		 					 // temporary dummy client 								 // reference to client for GUI to send messages
 	
@@ -34,15 +34,15 @@ public class GUIManager {
 	
 	private boolean hasBet = false; 							 // variable for tracking if player placed a bet or not 
 	
-	JFrame frame;												 // main window
-	JPanel mainPanel, 											 // holds all differnt screens (login, lobby, table)
-		   loginPanel, signUpPanel, playerlobbyPanel, tablePanel,
-		   playerTablePanel, tableScreenPanel, playerCards, dealerCards;  				 // individual screens
+	private JFrame frame;												 // main window
+	private JPanel mainPanel, 											 // holds all differnt screens (login, lobby, table)
+		   loginPanel, signUpPanel, playerlobbyPanel, tablePanel, dealerLobbyPanel,
+		   playerTablePanel, dealerTablePanel, tableScreenPanel, playerCards, dealerCards;  				 // individual screens
 	
-	JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl, faceDownCard;// table screen labels
+	private JLabel statusLbl, balanceLbl, currBetLbl, pHandLbl, dHandLbl, faceDownCard;// table screen labels
 	
 	
-	public GUIManager(FakeClientGUITester client) {
+	public GuiManager(FakeClientGUITester client) {
 		
 		this.client = client; // reference to specific client
 		
@@ -70,13 +70,14 @@ public class GUIManager {
 		loginPanel = createLoginPanel();
 		signUpPanel = createSignUpPanel();
 		playerlobbyPanel = createPlayerLobbyPanel();
+		dealerLobbyPanel = createDealerLobbyPanel();
 		tableScreenPanel = createPlayerTablePanel();
-		//tablePanel = createTablePanel();
+
 		
 		
 		mainPanel.add(loginPanel, "LOGIN");
 		mainPanel.add(playerlobbyPanel, "PLAYER_LOBBY");
-		//mainPanel.add(tablePanel, "TABLE");
+		mainPanel.add(dealerLobbyPanel, "DEALER_LOBBY");
 		mainPanel.add(signUpPanel, "REGISTER");
 		mainPanel.add(tableScreenPanel, "PLAYER_TABLE");
 		
@@ -570,13 +571,205 @@ public class GUIManager {
 	    });
 		return lobbyPanel;
 	}
-	/*
 	
 	private JPanel createDealerLobbyPanel() 
 	{
 		
-		// return the panel
+		/****************************************************
+		 * 						DESIGN
+		 ****************************************************/
+		JPanel dLobbyPanel = new JPanel();								// create main lobby screen
+
+		dLobbyPanel.setLayout(new GridBagLayout());						// set layout to GridBag for controling layout
+		
+		dLobbyPanel.setBackground(new Color(0, 80, 0));					// set background color to a dark green
+		
+		GridBagConstraints controlLayout = new GridBagConstraints();    // layout modifiers
+
+		controlLayout.insets = new Insets(5,5,5,5); 					// makes space between margins (outside) (top, left, bottom, right)
+		controlLayout.fill = GridBagConstraints.BOTH;					// fill screen both horizontally + vertically
+		
+		//---------------------------------------------
+		// 		CREATE LEFT SIDE OF SCREEN 
+		//---------------------------------------------
+		
+		//------------Game Instructions Label-------------------
+		JLabel rulesHeader = new JLabel("JOB RULES");					// create label
+		rulesHeader.setFont(new Font("Arial", Font.BOLD, 20));			// set the font + size
+		rulesHeader.setForeground(Color.WHITE);							// set text color
+
+		
+		// Layout Modifiers
+		controlLayout.gridx = 0;										// how many rows it takes up
+	    controlLayout.gridy = 0;										// how many columns it takes up	
+	    controlLayout.weightx = 0.10;									// how much space horizontally will take up; distribute space; 10%
+	    controlLayout.weighty = 0;										// how much space vertically will take up; 0%
+
+	    dLobbyPanel.add(rulesHeader, controlLayout);						// add label to main panel
+	    
+	    //------------Game Instructions Text-------------------
+		JTextArea instructions = new JTextArea();
+		instructions.setText( 
+				"1. Click on one of the available tables to\n  join a game.\n\n" +
+				"2. Start the round to initiate the round.\n\n" +
+				"3. Once round ends, replay another\n    round if player(s)" +
+				" would like to.\n\n" +
+				" - all players must make a bet before\n   they start the round.\n" +
+				" - You must hit on 16 or less AND stand \n   on 17+.\n" +
+				"\n ENJOY ( ^ v ^ )/"
+		);
+
+		// Customize font, size, text color, background color
+		instructions.setFont(new Font("Arial", Font.PLAIN, 18));
+		instructions.setForeground(Color.BLACK);
+		instructions.setBackground(Color.LIGHT_GRAY);
+		
+		
+		instructions.setLineWrap(true);									// auto wrap text at line end
+	    instructions.setWrapStyleWord(true);							// wrap at the whole word (not in between words)
+	    instructions.setEditable(false);								// won't let users edit text area
+	    instructions.setPreferredSize(new Dimension(300,0));			// preferred width of layout
+
+	    // Layout Modifiers
+		controlLayout.gridx = 0;
+		controlLayout.gridy = 1;
+		controlLayout.weightx = 0.10;
+		controlLayout.weighty = 1.0;
+
+		dLobbyPanel.add(instructions, controlLayout);					// add instructions to main panel
+
+		//---------------------------------------------
+	  	// 			CREATE LEFT SIDE BUTTONS
+	  	//---------------------------------------------
+		
+		//------------Logout + Account Buttons-------------------
+		JPanel leftButtonsPanel = new JPanel();								// create panel to group buttons together
+		 
+		// create logout button (returns to login screen)
+		JButton logoutBtn = new JButton("Logout");
+		logoutBtn.setForeground(Color.BLACK);
+
+		leftButtonsPanel.add(logoutBtn);
+		
+		// Layout Modifiers
+		controlLayout.gridx = 0;
+		controlLayout.gridy = 2;
+		controlLayout.weightx = 0.10;
+		controlLayout.weighty = 0;
+		
+		dLobbyPanel.add(leftButtonsPanel, controlLayout);						// add button panel to main panel
+		
+		//---------------------------------------------
+		// 		CREATE RIGHT SIDE OF SCREEN 
+		//---------------------------------------------
+		
+		//------------Game Tables Label-------------------
+		JLabel tableHeader = new JLabel("Game Tables");
+		tableHeader.setForeground(Color.WHITE);
+		tableHeader.setFont(new Font("Arial", Font.BOLD, 20));
+		
+		// Layout Modifiers
+		controlLayout.gridx = 1;
+		controlLayout.gridy = 0;
+		controlLayout.weightx = 0.90;
+		controlLayout.weighty = 0;
+		
+		dLobbyPanel.add(tableHeader, controlLayout);						// add table header to main panel
+
+		
+		//--------List of Game Tables Available----------
+		tableContainer = new DefaultListModel<>(); 			 			// create a container that hold the game tables
+		tableList = new JList<>(tableContainer);               			// holds the tables data into a list
+
+		tableList.setFont(new Font("Arial", Font.BOLD, 18));
+		/******************************************************************************************/
+		/* 				TEMPORARY TEST DATA - REMOVE LATER WHEN SERVER SENDS TABLE LIST			  */
+		
+		tableContainer.addElement("Table 1 (2/5 players)");
+		tableContainer.addElement("Table 2 (4/5 players)");
+		tableContainer.addElement("Table 3 (1/5 players)");
+		
+		/*******************************************************************************************/
+		
+		
+		tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// lets you click 1 table at a time
+			     
+		JScrollPane scroll = new JScrollPane(tableList); 				// puts list into a scrollable pane (only on the right side)
+		    
+		// Layout Modifiers
+		controlLayout.gridx = 1;
+		controlLayout.gridy = 1;
+		controlLayout.weightx = 0.90;
+		controlLayout.weighty = 1.0;
+		
+		dLobbyPanel.add(scroll, controlLayout);							// add scroll pane to main panel
+	    
+		//---------------------------------------------
+	  	// 			CREATE LEFT SIDE BUTTONS
+	  	//---------------------------------------------
+		
+		//------------Join Table Button-------------------
+		JPanel rightButtonsPanel = new JPanel();
+		
+		JButton joinBtn = new JButton("Manage Table");
+		joinBtn.setForeground(Color.BLACK);
+		
+		// Position button panel (BOTTOM RIGHT)
+		controlLayout.gridx = 1;      // left column
+		controlLayout.gridy = 2;      // bottom row
+		controlLayout.weightx = 0.10; // same width as instructions
+		controlLayout.weighty = 0;    // no vertical stretching
+		
+		rightButtonsPanel.add(joinBtn);
+		dLobbyPanel.add(rightButtonsPanel, controlLayout);
+	    /****************************************************
+		 * 					ACTION LISTENERS
+		 ****************************************************/
+		
+		// when logout button is clicked it sends user to login screen
+	    logoutBtn.addActionListener(actionEvent -> showLoginScreen());
+		
+	    // when join button is selected 
+	    joinBtn.addActionListener(actionEvent -> {
+	    	
+	    	int index = tableList.getSelectedIndex(); 								// index of selected table from JList
+	    	
+	    	// if no tables are selected once user clicks the button
+	    	if(index == -1)
+	    	{
+	    		// shows a warning pop up "Select a Table First!"
+	    		JOptionPane.showMessageDialog(dLobbyPanel, "Select a Table First!");
+	    		
+	    		return; // stops executing to prevent the invalid join
+	    	}
+	    	
+	    	String table = tableContainer.getElementAt(index);						// convert index to a table string
+	    	
+	    	// asks user for confirmation of it they want to join table or not
+	    	int choice = JOptionPane.showConfirmDialog(
+	    			dLobbyPanel, 
+	    			"Manage " + table + "?",
+	    			"Manage Table",
+	    			JOptionPane.YES_NO_OPTION
+	    	);
+	    	
+	    	// if user confirms
+	    	if(choice == JOptionPane.YES_OPTION) {
+	    		// show what table user is joining
+	    		JOptionPane.showMessageDialog(dLobbyPanel, "Joining " + table);
+	    		
+	    		// tells server player wants to join a table
+	    		client.sendMessage("JOIN_TABLE_REQUEST"); //**********WILL MODIFY ONCE CLIENT IS MADE*************
+	    		
+	    		showPlayerTableScreen(); // proceed to going to table game (Player perspective)
+	    	}
+	    			
+	    });
+		return dLobbyPanel;
 	}
+	
+	/*
+
 	private JPanel createDealerTablePanel() 
 	{
 		
@@ -596,7 +789,7 @@ public class GUIManager {
 		GridBagConstraints layoutControl = new GridBagConstraints();
 				
 		layoutControl.insets = new Insets(10,10,10,10); 		// adds padding around components (top, left, bottom, right)
-		layoutControl.fill = GridBagConstraints.NONE; // fill space horizontal
+		layoutControl.fill = GridBagConstraints.NONE; 			// fill space horizontal
 		layoutControl.anchor = GridBagConstraints.CENTER;
 		
 		JLabel dealerLbl = new JLabel("Dealer");
@@ -666,6 +859,7 @@ public class GUIManager {
 	    playerCards = new JPanel();
         layoutControl.fill = GridBagConstraints.NONE;
 
+        //********************TEMPORARY TILL CLIENT/SERVER MADE
         playerCards.add(createCardImage("ACE_SPADES"));
         playerCards.add(createCardImage("10_HEARTS"));
         
@@ -819,6 +1013,8 @@ public class GUIManager {
 		JOptionPane.showMessageDialog(frame, "Make a Bet To Start The Game");
 	}
 	public void showDealerLobbyScreen() {
+		currentScreen = "DEALER_LOBBY";										   // updates the current screen state to login screen
+		((CardLayout) mainPanel.getLayout()).show(mainPanel, "DEALER_LOBBY");  //
 	}
 	
 	public void showDealerTableScreen() {
@@ -1003,34 +1199,32 @@ public class GUIManager {
 	{
 	    playersContainer = newPlayers;
 
-	    SwingUtilities.invokeLater(() -> { // run later on UI thread
+	    tableScreenPanel.removeAll(); 
 
-	    	 tableScreenPanel.removeAll(); 
+        GridBagConstraints layoutControl = new GridBagConstraints();
+        layoutControl.insets = new Insets(10,10,10,10);
+        
+        for (int i = 0; i < playersContainer.size(); i++) 
+        {
+   		 String name = playersContainer.getElementAt(i);
 
-	         GridBagConstraints layoutControl = new GridBagConstraints();
-	         layoutControl.insets = new Insets(10,10,10,10);
-	         
-	    	 for (int i = 0; i < playersContainer.size(); i++) {
-	    		 String name = playersContainer.getElementAt(i);
+            JPanel playerBox = createPlayerBox(name, 0, 0);
 
-	             JPanel playerBox = createPlayerBox(name, 0, 0);
+           switch(i)
+           {
+               case 0 -> { layoutControl.gridx = 0; layoutControl.gridy = 2; }
+               case 1 -> { layoutControl.gridx = 0; layoutControl.gridy = 4; }
+               case 2 -> { layoutControl.gridx = 4; layoutControl.gridy = 1; }
+               case 3 -> { layoutControl.gridx = 4; layoutControl.gridy = 3; }
+               case 4 -> { layoutControl.gridx = 4; layoutControl.gridy = 5; }
+           }
 
-	            switch(i)
-	            {
-	                case 0 -> { layoutControl.gridx = 0; layoutControl.gridy = 2; }
-	                case 1 -> { layoutControl.gridx = 0; layoutControl.gridy = 4; }
-	                case 2 -> { layoutControl.gridx = 4; layoutControl.gridy = 1; }
-	                case 3 -> { layoutControl.gridx = 4; layoutControl.gridy = 3; }
-	                case 4 -> { layoutControl.gridx = 4; layoutControl.gridy = 5; }
-	            }
+           tableScreenPanel.add(playerBox, layoutControl);	 
+           
+           }
 
-	            tableScreenPanel.add(playerBox, layoutControl);	 
-	            
-	            }
-
-	        tableScreenPanel.revalidate();
-	        tableScreenPanel.repaint();
-	    });
+       tableScreenPanel.revalidate();
+       tableScreenPanel.repaint();
 	}
 	
 	public void addPlayerCard(String cardName)
@@ -1073,27 +1267,67 @@ public class GUIManager {
 	
 	
 	public void displayStatus(String message) {
-		
+		if (statusLbl != null) 
+        {
+            statusLbl.setText(message);
+        }
 	}
 	
 	public void displayBalance(double amount) {
-		
+		if (balanceLbl != null) 
+        {
+            balanceLbl.setText("Balance: $" + String.format("%.2f", amount));
+        }
 	}
 	
 	public void displayCurrentBet(double amount) {
-		
+		if (currBetLbl != null)
+        {
+            currBetLbl.setText("Current Bet: $" + String.format("%.2f", amount));
+        }
 	}
 	
 	public void displayPlayerHand(String cards, int total) {
-		
+		playerCards.removeAll();
+
+        String[] cardArray = cards.split(",");
+
+        for (String c : cardArray) {
+            playerCards.add(createCardImage(c.trim()));
+        }
+
+        playerCards.revalidate();
+        playerCards.repaint();
+
+        displayStatus("Your Total: " + total);
 	}
 	
 	public void displayDealerHand(String cards, int total) {
-		
+		 dealerCards.removeAll();
+		 String[] cardArray = cards.split(",");
+
+	        for (String c : cardArray) {
+	            dealerCards.add(createCardImage(c.trim()));
+	        }
+
+	        dealerCards.revalidate();
+	        dealerCards.repaint();
+
+	        displayStatus("Dealer Showing: " + total);
+
 	}
 	
 	public void displayRoundResult(String result) {
-		
+		displayStatus(result);
+
+        JOptionPane.showMessageDialog(
+            frame,
+            result,
+            "ROUND RESULT",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
+        hasBet = false; // reset round state
 	}
 	
 }

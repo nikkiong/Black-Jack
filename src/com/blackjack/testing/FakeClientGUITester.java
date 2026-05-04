@@ -1,6 +1,6 @@
 package com.blackjack.testing;
 
-import com.blackjack.client.gui.GUIManager;
+import com.blackjack.client.gui.GuiManager;
 
 // Client Dummy class to test GUIManager while no Client.java yet
 public class FakeClientGUITester {

@@ -1,7 +1,7 @@
 package com.blackjack.testing;
 
 // Temporary GUI test class to run and debug screens without backend/client
-import com.blackjack.client.gui.GUIManager;
+import com.blackjack.client.gui.GuiManager;
 
 public class GUITest {
 	
@@ -11,9 +11,9 @@ public class GUITest {
 		// use dummy client for testing
 	    FakeClientGUITester testClient = new FakeClientGUITester();
 		
-		GUIManager gui = new GUIManager(testClient);
+		GuiManager gui = new GuiManager(testClient);
 		
-		gui.showPlayerTableScreen();
+		gui.showDealerLobbyScreen();
 		
 
 	}
